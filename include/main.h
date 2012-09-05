@@ -1,6 +1,6 @@
 typedef struct Block {
-long lfixed_size_buffer;
-long ltotal_file_blocks;
+char lfixed_size_buffer[100];
+long lnext_file_blocks;
 };
 
 typedef struct Free_List {
@@ -21,6 +21,7 @@ char *sfile_system_label;
 long lsize;
 long ltotal_file_descriptors;
 long lused_file_descriptors;
+long ltotal_file_blocks;
 struct File_Descriptor *cpfile_descriptor;
 struct Free_List *cpfree_list;
 };
