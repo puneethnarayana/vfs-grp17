@@ -8,7 +8,7 @@ linkedlist.o: linkedlist.c ../include/linkedlist.h
 	gcc -c linkedlist.c -o linkedlist.o
 hashtable.o: hashtable.c ../include/hashtable.h
 	gcc -c hashtable.c -o hashtable.o
-test.o: test.c ../include/main.h ../include/narray.h ../include/bst.h ../include/linkedlist.h ../include/hashtable.h 
-	gcc -c test.c -o test.o
-finalout: main.o narray.o bst.o linkedlist.o hashtable.o test.o
-	gcc main.o narray.o bst.o linkedlist.o hashtable.o test.o -o finalout
+VFS17.o: VFS17.c ../include/main.h ../include/narray.h ../include/bst.h ../include/linkedlist.h ../include/hashtable.h 
+	gcc -c VFS17.c -o VFS17.o
+finalout: main.o narray.o bst.o linkedlist.o hashtable.o VFS17.o
+	gcc main.o narray.o bst.o linkedlist.o hashtable.o VFS17.o -o finalout

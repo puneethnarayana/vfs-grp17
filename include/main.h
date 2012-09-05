@@ -16,11 +16,12 @@ long llocation_block_no;
 };
 
 typedef struct Main_Header {
-char sfile_system_label[100];
+char *sfile_system_label;
+long lsize;
 long ltotal_file_descriptors;
 long lused_file_descriptors;
 struct File_Descriptor *cpfile_descriptor;
 struct Free_List *cpfree_list;
 };
 
-void disp(void);
+void createVFS(char* , long);
