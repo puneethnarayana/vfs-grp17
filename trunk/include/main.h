@@ -1,5 +1,6 @@
 typedef struct Block {
 long lfixed_size_buffer;
+long ltotal_file_blocks;
 };
 
 typedef struct Free_List {
