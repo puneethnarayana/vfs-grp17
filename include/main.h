@@ -9,9 +9,9 @@ struct Free_List *cpnext_free_block_no;
 };
 
 typedef struct File_Descriptor {
-char sfile_name[100];
-char slocation_full_path[250];
-char sfile_type[50];
+char *sfile_name;
+char *slocation_full_path;
+char *sfile_type;
 long lfile_size;
 long llocation_block_no;
 };

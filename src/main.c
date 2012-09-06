@@ -21,20 +21,20 @@ void createVFS(char *name, long size) {
 	
 	printf("\nsize left after ceation of meta header: %ld", m1.lsize);
 	m1.ltotal_file_descriptors = (m1.lsize)/(sizeof(fd1) + sizeof(b1)); // calculating the no. of file descriptors can be used in remaining space
-	//m1.ltotal_file_descriptors = 100; // calculating the no. of file descriptors can be used in remaining space
+	
 	printf("\nsize of each file descriptor : %d", sizeof(fd1));
 	printf("\ntotal file descriptors : %ld", m1.ltotal_file_descriptors);
     m1.lsize = m1.lsize - (m1.ltotal_file_descriptors * sizeof(fd1)); // size remaining after creation of file descriptors
     
     printf("\nsize left after creation of file descriptors: %ld", m1.lsize);
     m1.ltotal_file_blocks = (m1.lsize)/(sizeof(b1)); // calculating the no. of file blocks can be used in remaining space
-    //b1.ltotal_file_blocks = 100; // calculating the no. of file blocks can be used in remaining space
+    
   
     printf("\nsize of each file block : %d", sizeof(b1));
     printf("\ntotal file blocks : %ld", m1.ltotal_file_blocks);
     m1.lsize = m1.lsize - (m1.ltotal_file_blocks * sizeof(b1)); // calculating the space unused 
 	
-	printf("\nsize left after creation of file block: %ld\n", m1.lsize);
+	printf("\nspace unsed: %ld\n", m1.lsize);
     
     /* wrting large binary file of given size including the 
      * 1.meta header
@@ -48,17 +48,22 @@ void createVFS(char *name, long size) {
 		printf("Error in Creating VFS");
 	}
 	else {
-		fwrite(&m1, sizeof(m1), 1, fptr); // writing meta header
+		
+		// writing meta header
+		fwrite(&m1, sizeof(m1), 1, fptr); 
 		printf("\nmeta header created\n");
+	    
+	    // writing file descriptors
 		for (; i<= m1.ltotal_file_descriptors; i++) {
-			fwrite(&fd1, sizeof(fd1), 1, fptr); // writing file descriptors
+			fwrite(&fd1, sizeof(fd1), 1, fptr); 
 		}
 		printf("file  descriptor created\n"); 
-	
-	   for (; j<= m1.ltotal_file_blocks; j++) {
-			fwrite(&b1, sizeof(b1), 1, fptr); // writing file blocks
+	    // writing file blocks
+	    for (; j<= m1.ltotal_file_blocks; j++) {
+			fwrite(&b1, sizeof(b1), 1, fptr); 
 		}
 		printf("file block created\n"); 
 		fclose(fptr); // closing the file to store it in persistent memory
+		printf("\n--------------------VFS Created-----------------------------\n");
 	}
 }
