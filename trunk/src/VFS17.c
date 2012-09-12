@@ -17,31 +17,30 @@ int main(int agrc, char* argv[]) {
 	scanf("%s",cmdinput);
 	while(strcmp(cmdinput,"exit")){
 			if(!strcmp(cmdinput,"create")) { 
-				printf("VFS Name: ");
+				//printf("VFS Name: ");
 				scanf("%s", vfs_name);
-				printf("VFS Size: ");
+				//printf("VFS Size: ");
 				scanf("%lu", &vfs_size);
 				createVFS(vfs_name, vfs_size);
 			}
 			else if(!strcmp(cmdinput, "mount"))
 			{
-				printf("Mount VFS: ");
+				//printf("Mount VFS: ");
 				scanf("%s", &mount_name);
-				fptr = mount_VFS(vfs_name);
-				if(fptr == NULL) {
-					exit(0);
-				}
-				else {
+				mount_VFS(vfs_name);
 				cmdpromptmount = strcat(mount_name,"@VFS-#17$ ");
 				printf(cmdpromptmount);
 				scanf("%s",cmdinput);
-				while(strcmp(cmdinput,"exit")) {
+				while(strcmp(cmdinput,"unmount")) {
 					
 					if(!strcmp(cmdinput,"write")) {
 						write_File(vfs_name);
 					}
 					else if(!strcmp(cmdinput,"delete")) {
 						printf("Deleted\n");
+					}
+					else if(!strcmp(cmdinput,"stats")) {
+						stats(vfs_name);
 					}
 					else {
 						printf("invalid command\n");
@@ -50,14 +49,13 @@ int main(int agrc, char* argv[]) {
 					scanf("%s",cmdinput);
 						
 				}
-				}
+					unmount_VFS();
 			}
 			
-			else if(!strcmp(cmdinput, "unmount")) {
-				printf("Unmount VFS: ");
-				scanf("%s", vfs_name);
-				unmount_VFS(vfs_name, fptr);				
-			}
+			//else if(!strcmp(cmdinput, "unmount")) {
+				////printf("Unmount VFS: ");
+				//scanf("%s", vfs_name);
+								
 			else {
 				printf("invalid command\n");
 				
@@ -67,5 +65,3 @@ int main(int agrc, char* argv[]) {
 	}
 	return 0;	
 }
-
-	
