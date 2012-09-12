@@ -1,11 +1,9 @@
 typedef struct Block {
-char lfixed_size_buffer[100];
-long lnext_file_blocks;
+char sfixed_size_buffer[1024];
 };
 
 typedef struct Free_List {
-long lblock_no;
-struct Free_List *cpnext_free_block_no;
+char *bitmap;
 };
 
 typedef struct File_Descriptor {
@@ -22,8 +20,8 @@ long lsize;
 long ltotal_file_descriptors;
 long lused_file_descriptors;
 long ltotal_file_blocks;
-struct File_Descriptor *cpfile_descriptor;
-struct Free_List *cpfree_list;
+long freeblock;
+long freedescriptor;
 };
 
 void createVFS(char* , long);
