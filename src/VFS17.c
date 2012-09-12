@@ -9,6 +9,7 @@
 int main(int agrc, char* argv[]) {
 	char cmdinput[20];
 	char vfs_name[100];
+	char mount_name[200];
 	long vfs_size;
 	FILE *fptr;
 	char *cmdpromptmount;
@@ -25,9 +26,13 @@ int main(int agrc, char* argv[]) {
 			else if(!strcmp(cmdinput, "mount"))
 			{
 				printf("Mount VFS: ");
-				scanf("%s", vfs_name);
+				scanf("%s", &mount_name);
 				fptr = mount_VFS(vfs_name);
-				cmdpromptmount = strcat(vfs_name,"@VFS-#17$ ");
+				if(fptr == NULL) {
+					exit(0);
+				}
+				else {
+				cmdpromptmount = strcat(mount_name,"@VFS-#17$ ");
 				printf(cmdpromptmount);
 				scanf("%s",cmdinput);
 				while(strcmp(cmdinput,"exit")) {
@@ -44,6 +49,7 @@ int main(int agrc, char* argv[]) {
 					printf(cmdpromptmount);
 					scanf("%s",cmdinput);
 						
+				}
 				}
 			}
 			
