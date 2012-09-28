@@ -1,1 +1,0 @@
-void narray(void);
