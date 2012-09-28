@@ -3,7 +3,7 @@
 #include "../include/bst.h"
 #include "../include/hashtable.h"
 #include "../include/linkedlist.h"
-#include "../include/narray.h"
+#include "../include/nary.h"
 #include <string.h>
 #include <stdlib.h>
 
