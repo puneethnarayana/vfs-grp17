@@ -1,38 +1,39 @@
 #include<stdio.h>
 #include "../include/main.h"
-#include "../include/bst.h"
+//#include "../include/bst.h"
 #include "../include/hashtable.h"
 #include "../include/linkedlist.h"
 #include "../include/nary.h"
 #include <string.h>
 #include <stdlib.h>
 
-
-void bitMapInit();
-long freeLocation();
-void bitmapUpdate(long, int);
 //global variables
 struct Main_Header m1; 
 struct Block b1;
 struct File_Descriptor fd1;
 struct Free_List fl1;
+struct Hash_Table ht1;
+struct List_Node *ln1;
+t_node *root = NULL;
 FILE *fptr; // pointer to the file object	
+
+int search_File(char*, char*);
 	
 /* function for creating the large binary file for VFS */
-void createVFS(char *name, long size) {
+void create_VFS(char *name, long size) {
 	int i=1, j=1; //loop variable for creating file descritors and file blocks
 	
 	printf("--------------------Creating VFS-----------------------------");
 	
 	m1.sfile_system_label = name;  //storing the VFS label
 	printf("\nvfs name : %s", m1.sfile_system_label);
-	printf("\nsize of meta header: %d", sizeof(m1));
+	printf("\nsize of meta header: %ld", sizeof(m1));
 	m1.lsize = size - sizeof(m1); // size remaining after creation of meta header 
 	
 	//printf("\nsize left after ceation of meta header: %ld", m1.lsize);
 	m1.ltotal_file_descriptors = (m1.lsize)/(sizeof(fd1) + sizeof(b1)); // calculating the no. of file descriptors can be used in remaining space
 	
-	printf("\nsize of each file descriptor : %d", sizeof(fd1));
+	printf("\nsize of each file descriptor : %ld", sizeof(fd1));
 	printf("\ntotal file descriptors : %ld", m1.ltotal_file_descriptors);
     m1.lsize = m1.lsize - (m1.ltotal_file_descriptors * sizeof(fd1)); // size remaining after creation of file descriptors
     
@@ -40,7 +41,7 @@ void createVFS(char *name, long size) {
     m1.ltotal_file_blocks = (m1.lsize)/(sizeof(b1)); // calculating the no. of file blocks can be used in remaining space
     
   
-    printf("\nsize of each file block : %d", sizeof(b1));
+    printf("\nsize of each file block : %ld", sizeof(b1));
     printf("\ntotal file blocks : %ld", m1.ltotal_file_blocks);
     m1.lsize = m1.lsize - (m1.ltotal_file_blocks * sizeof(b1)); // calculating the space unused 
 	
@@ -69,7 +70,12 @@ void createVFS(char *name, long size) {
 		fwrite(&m1, sizeof(m1), 1, fptr); 
 		printf("\nmeta header created\n");
 	    
+	    //file descriptor default values
 	    fd1.llocation_block_no = -9999;
+	    fd1.lfile_size = 0;
+	    //strcpy(fd1.sfile_name,"bcd");
+	    //fd1.sfile_type = 'f';
+	    //strcpy(fd1.slocation_full_path, "\null\null");
 	    // writing file descriptors
 	    fseek(fptr,m1.freedescriptor,SEEK_SET);
 		for (; i<= m1.ltotal_file_descriptors; i++) {
@@ -96,50 +102,133 @@ void mount_VFS(char *name) {
 	else {
 		fseek(fptr,0,SEEK_SET);
 		fread(&m1, sizeof(m1), 1, fptr);
-		printf("\n--------------------Initializing Bitmap\n");
+		//printf("\n--------------------Initializing Bitmap\n");
 		bitMapInit();
-		printf("\n--------------------Bitmap Initialized\n");
-		printf("\n--------------------VFS Mounting\n");
-		printf("\n--------------------VFS Mounted\n");
+		initialzeHashTable(&ht1);
+		//printf("\n--------------------Bitmap Initialized\n");
+		//printf("\n--------------------VFS Mounting\n");
+		//printf("\n--------------------VFS Mounted\n");
+		
+		//initialize data structure
+		//printf("\n--------------------Initializing Data Structures\n");
+		fseek(fptr,m1.freedescriptor,SEEK_SET);
+		int k = 1;
+		for (; k<= m1.ltotal_file_descriptors; k++) {
+			fread(&fd1, sizeof(fd1), 1, fptr);
+			//printf("outside %ld",fd1.llocation_block_no);
+			if(fd1.llocation_block_no != -9999) { 
+				//printf("inside %ld\n",fd1.llocation_block_no);
+				//printf("%s\n",fd1.sfile_name);
+				//call n-aray insert function
+				insert_node(&root, &fd1);
+				//printf("%d", rs);
+				//call hash table insert function
+				insertHashTable(&ht1, &fd1);
+				//call BST insert function
+				insertBst(&fd1);
+				//List_Node *start = searchHashTable(&ht1, "abc");
+				//if(start == NULL) {
+					//printf("file not found\n");
+				//}
+				//else {
+					//printf("found\n"); 
+					//search_File("abc", "abc");
+				//}
+			
+			}
+		}
+		//displayList();
+		//printtree(&root);
+		//ln1 = (List_Node*)malloc(sizeof(List_Node*));
+		
+
 	}
 }
 
 void unmount_VFS() {
-	printf("\n--------------------Unmounting VFS\n");
+	//printf("\n--------------------Unmounting VFS\n");
 	fclose(fptr);
 	free(fl1.bitmap);
-	printf("\n--------------------VFS Unmounted\n");
+	//printf("\n--------------------VFS Unmounted\n");
 }	
 
+int search_File(char *name, char *outputfile) {
+	List_Node *start = searchHashTable(&ht1, name);
+				if(start == NULL) {
+					printf("file not found\n");
+				}
+				else {
+					FILE *ft = fopen (outputfile, "a+" ) ;
+					if ( ft == NULL )
+							{
+								perror ("cannot open file") ;
+								fclose ( ft ) ;
+								return 0;
+							}
+					else {
+						while(start != NULL) {
+							//printf("%s\t%s\n", start->data->sfile_name, start->data->slocation_full_path);
+							fprintf(ft, "%s\t%s\n", start->data->sfile_name, start->data->slocation_full_path) ;
+							//fputs(start->data->slocation_full_path, ft) ;
+						start=start->next;
+						}
+					}
+					fclose ( ft ) ;
+				}
+				return 1;
+}
 
-void write_File(char *name) {
-	
-	char file_name[50];  
-	char ch,arr[1024];
-	
-	//fptr = fopen(name, "rb+"); // opening file for read/write
-	//printf("%ld", m1.freeblock);
-	//SEND pointer to the first location of the file block
-	//printf("before seek");
+void make_Dir(char *parentpath, char *dirname) {
+	//printf("%s %s", parentpath, dirname);
+	int flag;
 	fseek(fptr,m1.freeblock,SEEK_SET);
 	//printf("after seek");
 	//getting the first free location from the Bitmap
 	long a = freeLocation();
-	//printf("%ld",a);
-	//Pointing the pointer to the first file block to start writing
-	//int j;
-	//for(j=0;j < 100;j++) {
-	//fseek(fptr,m1.freedescriptor,SEEK_SET);
-	//fseek(fptr,j*sizeof(fd1),SEEK_CUR);
-	//fread(&fd1, sizeof(fd1), 1, fptr);
-	//printf("%ld", fd1.llocation_block_no);
-	//}
+	fseek(fptr,a*sizeof(b1),SEEK_CUR);
+	//fwrite(&arr, sizeof(arr), 1, fptr);
+	
+	//Sending pointer to write at the free location of the File Descriptor
+	fseek(fptr,m1.freedescriptor,SEEK_SET);
+	fseek(fptr,a*sizeof(fd1),SEEK_CUR);
+	strcpy(fd1.sfile_name, dirname);
+	strcpy(fd1.slocation_full_path, parentpath);
+	fd1.sfile_type = 'd';
+	fd1.lfile_size = 0;
+	fd1.llocation_block_no = a;
+	fwrite(&fd1, sizeof(fd1), 1, fptr);
+	//Update bit map by passing block no. of occupied block
+	bitmapUpdate(a, 1);
+	flag = insert_node(&root, &fd1);
+	if(flag == 0) {
+	printf("SUCCESS\n");
+	}
+	else {
+	printf("FAIL");
+	}
+	printtree(&root);
+	
+}
+
+void write_File() {
+	
+	char file_name[100];  
+	char path[512];
+	char ch,arr[1024];
+	
+	fseek(fptr,m1.freeblock,SEEK_SET);
+	//printf("after seek");
+	//getting the first free location from the Bitmap
+	long a = freeLocation();
+	
 	
 	fseek(fptr,a*sizeof(b1),SEEK_CUR);
 
 	//Write files to the file system
 		printf("Enter the Name of file: \n");
 		scanf("%s", file_name);
+		printf("Enter the path of file: \n");
+		scanf("%s", path);
 		printf("Enter the data to be written to file and press $ to indicate the end of file\n");
 		int i=0;
 		do
@@ -152,25 +241,71 @@ void write_File(char *name) {
 	//printf("before write");
 	fwrite(&arr, sizeof(arr), 1, fptr);
 	
-	//printf("after write");
-	//fclose(fwptr);	
 	//Sending pointer to write at the first location of the FDescript
 	fseek(fptr,m1.freedescriptor,SEEK_SET);
 	fseek(fptr,a*sizeof(fd1),SEEK_CUR);
-	fd1.sfile_name = file_name;
-	//fd1.slocation_full_path[250];
+	strcpy(fd1.sfile_name, file_name);
+	strcpy(fd1.slocation_full_path, path);
+	fd1.sfile_type = 'f';
 	//fd1.sfile_type;
 	fd1.lfile_size = sizeof(arr);
 	fd1.llocation_block_no = a;
 	fwrite(&fd1, sizeof(fd1), 1, fptr);
-	//for(i=0;i < 100;i++) {
-	//fseek(fptr,m1.freedescriptor,SEEK_SET);
-	//fseek(fptr,i*sizeof(fd1),SEEK_CUR);
-	//fread(&fd1, sizeof(fd1), 1, fptr);
-	//printf("%ld", fd1.llocation_block_no);
-	//}
 	//Update bit map by passing block no. of occupied block
 	bitmapUpdate(a, 1);
+}
+
+int add_File(char* dest, char* fname, char* src) {
+	char ch,arr[1024];
+	int c;
+	fseek(fptr,m1.freeblock,SEEK_SET);
+	//printf("after seek");
+	//getting the first free location from the Bitmap
+	long a = freeLocation();
+	
+	fseek(fptr,a*sizeof(b1),SEEK_CUR);
+    FILE *fp ;
+         fp = fopen(src,"r") ;
+         //printf("here %s", src);
+         if( fp == NULL )
+         {
+               perror ("cannot open file") ;
+               return 0;
+         }
+         else{
+			int i=0;
+			while (fgetc(fp) != EOF) {
+				ch = fgetc ( fp );
+				arr[i] = ch;
+				i++;
+			}
+			fclose(fp);
+			//printf("\n%s\n", arr);
+		 }
+
+	//Write files to the file system
+	//printf("before write");
+	fwrite(&arr, sizeof(arr), 1, fptr);
+	
+	//Sending pointer to write at the first location of the FDescriptor
+	fseek(fptr,m1.freedescriptor,SEEK_SET);
+	fseek(fptr,a*sizeof(fd1),SEEK_CUR);
+	strcpy(fd1.sfile_name, fname);
+	strcpy(fd1.slocation_full_path, dest);
+	//fd1.sfile_type;
+	fd1.lfile_size = sizeof(arr);
+	fd1.llocation_block_no = a;
+	fd1.sfile_type = 'f';
+	fwrite(&fd1, sizeof(fd1), 1, fptr);
+	//Update bit map by passing block no. of occupied block
+	bitmapUpdate(a, 1);
+	//inserting into naray
+	insert_node(&root, &fd1);
+	//inserting into hashtable
+	insertHashTable(&ht1, &fd1);
+	//inserting into BST
+	insertBst(&fd1);
+	return 1;
 }
 
 void delete_File() {
@@ -193,13 +328,6 @@ void bitMapInit() {
 			fl1.bitmap[i] = 1;
 	}
 	
-	//fseek(fptr,m1.freedescriptor,SEEK_SET);
-	//fseek(fptr,i*sizeof(fd1),SEEK_CUR);
-	
-	//for(i=0;i < 100;i++) {
-	//fread(&fd1, sizeof(fd1), 1, fptr);
-	//printf("%ld", fd1.llocation_block_no);
-	//}
 }
 
 // returns free bitmap location
@@ -227,11 +355,9 @@ void bitmapUpdate(long n, int flag){
 	fl1.bitmap[n]=0;		
 }
 
-void stats(char *name)
+void stats()
 {
-		//fptr = fopen(name, "rb+");
-		//fseek(fptr,0,SEEK_SET);
-		//fread(&m1, sizeof(m1), 1, fptr);
+
 		printf("\nMount Label: %s", m1.sfile_system_label);
 		printf("\nNext Free File Descriptor Location :%ld", m1.freedescriptor + sizeof(fd1) * (freeLocation()));
 		printf("\nNext Free Block Location: %ld", m1.freeblock + sizeof(b1) * (freeLocation()));
