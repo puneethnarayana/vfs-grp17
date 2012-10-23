@@ -7,9 +7,9 @@ char *bitmap;
 };
 
 struct File_Descriptor {
-char *sfile_name;
-char *slocation_full_path;
-char *sfile_type;
+char sfile_name[100];
+char slocation_full_path[512];
+char sfile_type;
 long lfile_size;
 long llocation_block_no;
 };
@@ -25,3 +25,6 @@ long freedescriptor;
 };
 
 void createVFS(char* , long);
+void bitMapInit();
+long freeLocation();
+void bitmapUpdate(long, int);

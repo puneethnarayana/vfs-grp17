@@ -1,14 +1,14 @@
 main.o: main.c ../include/main.h
 	gcc -c main.c -o main.o
-narray.o: narray.c ../include/narray.h
-	gcc -c narray.c -o narray.o
+nary.o: nary.c ../include/nary.h
+	gcc -c nary.c -o nary.o
 bst.o: bst.c ../include/bst.h
 	gcc -c bst.c -o bst.o
 linkedlist.o: linkedlist.c ../include/linkedlist.h
 	gcc -c linkedlist.c -o linkedlist.o
 hashtable.o: hashtable.c ../include/hashtable.h
 	gcc -c hashtable.c -o hashtable.o
-VFS17.o: VFS17.c ../include/main.h ../include/narray.h ../include/bst.h ../include/linkedlist.h ../include/hashtable.h 
+VFS17.o: VFS17.c ../include/main.h ../include/nary.h ../include/bst.h ../include/linkedlist.h ../include/hashtable.h 
 	gcc -c VFS17.c -o VFS17.o
-finalout: main.o narray.o bst.o linkedlist.o hashtable.o VFS17.o
-	gcc main.o narray.o bst.o linkedlist.o hashtable.o VFS17.o -o finalout
+finalout: main.o nary.o bst.o linkedlist.o hashtable.o VFS17.o
+	gcc main.o nary.o bst.o linkedlist.o hashtable.o VFS17.o -o finalout

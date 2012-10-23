@@ -1,201 +1,266 @@
-/*************************************************************************************/
-/*  C program to implement a binary search tree  */
-/*************************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-typedef struct bst_node
-{
-	struct bst_node *parent;
-	struct bst_node *left;
-	struct bst_node *right;
-	char full_path[100];
-	//fd *file_desc;
-}b_node;
-
-
-b_node *bst_create();
-/*Creates the bst, returns the root b_node*/
-
-b_node *bst_search( b_node **bst_root_ptr, char *full_path );
-int bst_intraverse(b_node *bst_root);
-/*searches the BST on the basis of fullpath and returns the searched node*/
-int bst_insert ( b_node **bst_root_ptr, char *data );
-/* Function for creating bst */
-b_node *bst_create()
-{
-	//printf("in bst_create \n");
-	b_node *new_node = NULL;
-	return new_node;
-}	
-
-/*Function for insertion of node in bst tree */
-int bst_insert ( b_node **bst_root_ptr, char *data )
-{
-	//printf("in bst_insert \n");
-	b_node *curr_node = NULL;
-	int slot_found;
-
-	char full_path[100];
-           if(strcmp(data,"/")!=0)
-	{strcpy(full_path,data);
-	strcat(full_path,"/");
-        //strcat(full_path,data);
-        }
-         else
-           {
-              strcpy(full_path,"/");
-            //  strcat(full_path,data);
-            }
-	b_node *new_node = (b_node*) malloc( sizeof(b_node) );
-	if( new_node == NULL ){
-		fprintf(stderr, "bst_create_node: Unable to allocate memory\n");
-		return 0;
-	}
-	strcpy(new_node->full_path,full_path);
-	//new_node->file_desc =data;
-	new_node->parent = NULL;
-	new_node->left = NULL;
-	new_node->right = NULL;
-
-	if( *bst_root_ptr == NULL ){
-		*bst_root_ptr = new_node;
-		printf("bst_root_ptr and full path=%s \n",full_path);
-		
-	}
-	else{
-		slot_found = 0;
-		curr_node = *bst_root_ptr;
-		while( !slot_found ){
-			if( strcmp( full_path ,curr_node->full_path) == 0 ){
-				fprintf(stderr, "bst_insert: Duplicate Path %s ignored\n", full_path);
-				slot_found = 1;
-				return 1;
-			}
-	  	   else if( strcmp(curr_node->full_path,full_path) > 0 ){
-				if( curr_node->left != NULL ){
-					slot_found = 0;
-					curr_node = curr_node->left;
-				}
-				else{
-					slot_found = 1;
-					curr_node->left = new_node;
-					new_node->parent = curr_node;
-					printf("left child=%s and new_node->parent->full_path=%s \n",curr_node->left->full_path,new_node->parent->full_path);
-				}
-			}
-		  else{ /* that is, key > curr_node->key */
-				if( curr_node->right != NULL ){
-					slot_found = 0;
-					curr_node = curr_node->right;
-				}
-				else{
-					slot_found = 1;
-					curr_node->right = new_node;
-					new_node->parent = curr_node;
-					printf("right child=%s and new_node->parent->full_path=%s \n",curr_node->right->full_path,new_node->parent->full_path);
-				}
-		   }
-		}
-	}
-	return 0;
-}
-int bst_intraverse( b_node  *bst_root){
-
-    if(bst_root!=NULL)
-    {
-       	b_node *curr_node = bst_root;
-        bst_intraverse((curr_node)->left);
-        printf("%s \n ",(curr_node)->full_path);
-        bst_intraverse((curr_node)->right);
-     }
-     return 1;
-}
-
-
-b_node *bst_search( b_node **bst_root_ptr, char *full_path ){
-   
-    //printf("in bst_search \n");
-	b_node *curr_node = NULL;
-	int slot_found;
-	
-	if( *bst_root_ptr == NULL ){
-		fprintf(stderr,"bst_search: The tree does not exists for search \n");
-		return NULL;
-		
-	}
-	else{
-		slot_found = 0;
-		curr_node = *bst_root_ptr;
-		while( !slot_found ){
-			if( strcmp( curr_node->full_path,full_path) == 0 ){
-				slot_found = 1;
-				//printf("in match of search\n");
-				}
-	  	   else if( strcmp(curr_node->full_path,full_path) > 0 ){
-				if( curr_node->left != NULL ){
-					//printf("in left of search got %s \n",curr_node->full_path);
-					slot_found = 0;
-					curr_node = curr_node->left;
-				}
-				else{
-					fprintf(stderr,"bst_search: The searched path %s not found. \n",full_path);
-					return NULL;
-				}
-			}
-		  else{ /* that is, key > curr_node->key */
-				if( curr_node->right != NULL ){
-					//printf("in right of search\n");
-					slot_found = 0;
-					curr_node = curr_node->right;
-				}
-				else{
-					fprintf(stderr,"bst_search: The searched path %s not found. \n",full_path);
-					return NULL;
-				}
-		   }
-		}
-	}
-	if(slot_found)	{
-		printf("The paths %s is found \n", full_path);
-		return curr_node;
-		}
-	else
-		{fprintf(stderr,"bst_search: The searched path %s not found. \n",full_path);
-		return NULL;
-		}
-	}
-
-void main()
-{ 
-    char data[]= "/File1/Folder1/Folder.a/b.c";
-    b_node *b =NULL;
-    b_node *bs=NULL;
-    if(b==NULL){
-	b = bst_create();
-	}
-	
-	char data4[]= "/File/Folder/Folder.a/b.c";
-	//bs = bst_search( &b, data4 );
-	bst_insert (&b, data );   
-    char data1[]= "/File2/Folder1/Folder.a/b.c";
-    bst_insert (&b, data1 );   
-    char data2[]= "/File/Folder1/Folder.a/b.c";
-    bst_insert (&b, data2 );   
-    char data3[]= "/File/Folder2/Folder.a/b.c";
-    bst_insert (&b, data3 );  
-    //bs = bst_search( &b, data4 ); 
-    bst_insert (&b, data4 );   
-    char data7[]= "/File/Folder2/Folder.a/b.c";
-    bst_insert (&b, data7 );   
-    bst_intraverse(b);
-    bs = bst_search( &b, "/File/Folder/Folder.a/b.c/" );
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include "../include/main.h"
+#include "../include/bst.h"
+  
+    /* Add Elements to the Binary Search Tree */
+    void insertBst(struct File_Descriptor *data ) {
        
-    if(bs==NULL){
-		printf("Path not Found\n");
+        struct node* newNode = (struct node*) malloc(sizeof (struct node));
+        struct node* temp;
+        struct node* tempParent;
+      
+        char full_path[100];
+        /*concatenate file name with the file path*/
+        if(strcmp(data->slocation_full_path,"/")!=0)
+        {
+            strcpy(full_path,data->slocation_full_path);
+            strcat(full_path,"/");
+            strcat(full_path,data->sfile_name);
+        }
+        else
+        {
+            strcpy(full_path,"/");
+            strcat(full_path,data->sfile_name);
+        }
+       
+        /*adding data to newNode*/
+        strcpy(newNode->full_path,full_path);
+        newNode->fd1  = data;
+        newNode->left = NULL;
+        newNode->right = NULL;
+        newNode->parent = NULL;
+        //printf("newnode data %s\n",newNode->full_path);
+        if(bstRoot == NULL){
+            /*if bstRoot is null,make the element bstRoot node*/
+            bstRoot = newNode;
+        }
+        else{
+            /*compare data with each node element and move to left or right child accordingly*/
+            temp = bstRoot;
+            tempParent = NULL;
+            /*traverses to the position where new node is to be inserted*/
+            while(temp){
+                /*checks for the duplicate data and retuns Failure in such case*/
+                if( strcmp( newNode->full_path ,temp->full_path) ==0 ){
+                    printf("duplicate--\n");
+                    temp = NULL;
+                }
+                else{
+                    /*if the data is less than the current's node data , move to left*/
+                    if( strcmp( newNode->full_path ,temp->full_path) >0 ){
+                        /*keeps the track of the parent node*/
+                        tempParent = temp;
+                        temp = temp->left;
+                    }
+                    else{
+                        /*if the data is more than the current's node data , move to right*/
+                        tempParent = temp;
+                        temp = temp->right;
+                    }
+                }
+            }
+            newNode->parent = tempParent;
+           
+            /*if new node's data is less than parents data,newnode is the left child*/
+            if( strcmp( newNode->full_path ,tempParent->full_path) <0 ){
+                tempParent->left =newNode;
+               // printf (" left %s \n", newNode->full_path);
+            }
+            else
+            {
+                /*newnode is the right child*/
+                tempParent->right = newNode;
+                //printf (" right %s \n", newNode->full_path);
+            }
+        }
+    }
+   /*Inorder traversal of BST*/
+    void inorder(struct node *t){
+        struct node *temp;
+        temp = t;
+        if(temp){
+            inorder(temp->left);
+            printf("\n %s \n",temp->full_path);
+            inorder(temp->right);
+        }
+    }
+  
+   /*Display elements in the BST*/
+    void displayList(){
+        struct node *temp = bstRoot;
+        if(bstRoot == NULL)
+            printf("empty tree\n");
+        else
+            inorder(temp);
+    }
+     
+    struct node* searchBstRec(struct node *t,char *data){
+        /*if bstRoot is null or key is equal to bstRoot, return bstRoot*/
+        if(t == NULL || (strcmp(data,t->full_path) ==0)){
+            return t;
+        }
+        else
+        {
+            /*search in the right sub tree*/
+            if( strcmp( data,t->full_path) <0 ){
+                return searchBstRec(t->left,data);
+            }
+            else
+            {
+                /*search in the right sub tree*/
+                return searchBstRec(t->right,data);
+            }
+         }
+    }
+    /* Search  Element in the List */
+    int searchBst(char *data){
+        struct node *t = bstRoot;
+        struct node *temp = searchBstRec(t,data);
+        /*if temp points to null return false else return true*/
+        if(temp == NULL) {
+            printf("element is not present");
+            return Failure;
+        }
+        else
+        {
+            printf("element is present");
+            return Success;
+        }
+    }
+   
+   
+    /*transplant function for delete function. It transplants node1 with node2*/
+    void transplantTree(struct node *node1,struct node *node2){
+        /*if node1 is the bstRoot.Makes node2 as the bstRoot*/
+        if(node1->parent == NULL){
+            bstRoot = node2;
+        }
+        else{
+            /*if node1 is the left child of its parent,replace it with node2*/
+            if(node1 == node1->parent->left){
+                node1->parent->left = node2;
+            }
+            else
+            {
+                /*if node1 is the right child of its parent,replace it with node2*/
+                node1->parent->right = node2;
+            }
+        }
+        if(node2 != NULL)
+        {
+                /*makes node1's parent as the node2's parent*/
+                node2->parent = node1->parent;
+        }
+    }
+   
+   
+    /* searches the minimum value node and returns the same.*/
+    struct node* treeMin(struct node *m){
+        while(m->left != NULL){
+            m = m->left;
+        }
+        printf("%s",m->full_path);
+        return m;
+    }
+  
+  
+    /* Delete  Element  from the Binary Search Tree */
+    void deleteBstElm(char *data){
+        struct node* location;
+        struct node* successor=NULL;
+       
+        /*Search the location of node to be deleted*/
+        location = searchBstRec(bstRoot,data);
+       
+        /*if the element is there in the list ,deletes the same.*/
+        if(location != NULL){
+            printf("element is present\n");
+            /*if the node does not have a left child, transplant it with right child*/
+            if(location->left == NULL){
+                transplantTree(location,location->right);
+            }
+            else{
+                    /*if the node does not have a right child, transplant it with left child*/
+                    if(location->right==NULL){
+                        transplantTree(location,location->left);
+                    }
+                    else{
+                        /*If the node has both child, find the successor*/
+                         successor = treeMin(location->right);
+                        /*If the successor is not the child of the node to be deleted,*/
+                        if(successor->parent != location){
+                            /* Transplant succesor with its right child*/
+                            transplantTree( successor, successor->right);
+                            /*the right child of the node to be deleted is made the right child of the successor*/
+                            successor->right = location->right;
+                            successor->right->parent =  successor;
+                        }
+                        /*Transplant the node to be deleted with the successor*/
+                        transplantTree(location, successor);
+                        /*the left child of the node to be deleted is made the left child of the successor*/
+                        successor->left = location->left;
+                        successor->left->parent = successor;
+                        successor->parent = location->parent;
+                      
+                    }
+            }
+            /*free the location*/
+            free(location);
+        }
+        else
+        {
+            /*the element is not there in the list.*/
+            printf("element is not present\n");
+        }
+    }
+  
+    /*int main(){
+      
+        int location;
+        char text[] = "text";
+        char fileName[] = "Ruchika.txt";
+        char fullPath[] = "/";
+        struct File_Descriptor* data = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
+        if(data!=NULL){
+		data->lfile_size = 10;
+		data -> llocation_block_no = 1;
+		strcpy(data->sfile_type,text);
+		strcpy(data -> sfile_name, fileName);
+		strcpy(data -> slocation_full_path,fullPath);
+		insertBst(data);
 		}
-	else{
-		printf("Path is Found\n");
-		}
-}
+      
+        //char text1[] = "text";
+        //char fileName1[] = "Alpna.txt";
+        //char fullPath1[] = "/Ruchika.txt";
+        //struct File_Descriptor* data1 = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
+        //if(data1!=NULL){
+        //data1->lfile_size = 10;
+        //data1 -> llocation_block_no = 2;
+        //data1->sfile_type = text1;
+        //data1 -> sfile_name = fileName1;
+        //data1 -> slocation_full_path = fullPath1;
+        //insertBst(data1);
+        //}
+      
+        printf ("List Contents: \n");
+        displayList();
+        printf("element search \n");
+        char data8[]= "/Ruchika.txt";  
+        location = searchBst(data8);
+        if(location == Success){
+            printf("element is present\n");
+        }
+        else
+        {
+            printf("element is not present\n");
+        }
+        printf("element delete:\n");
+        char data9[]= "/Ruchika.txt";  
+        deleteBstElm(data9);
+        displayList();
+      
+        return 0;
+    } */
