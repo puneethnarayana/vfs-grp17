@@ -9,6 +9,6 @@
 ../bin/hashtable.o: ../src/hashtable.c ../include/hashtable.h
 	gcc -c ../src/hashtable.c -o ../bin/hashtable.o
 ../bin/vfsdriver.o: ../test/vfsdriver.c ../include/vfs_17.h ../include/nary.h ../include/bst.h ../include/linkedlist.h ../include/hashtable.h ../include/vfs_errorcodes.h
-	gcc -c ../src/vfsdriver.c -o ../bin/vfsdriver.o
+	gcc -c ../test/vfsdriver.c -o ../bin/vfsdriver.o
 finalout: ../bin/vfs_17.o ../bin/nary.o ../bin/bst.o ../bin/linkedlist.o ../bin/hashtable.o ../bin/vfsdriver.o
 	gcc ../bin/vfs_17.o ../bin/nary.o ../bin/bst.o ../bin/linkedlist.o ../bin/hashtable.o ../bin/vfsdriver.o -o ../bin/vfs_17
