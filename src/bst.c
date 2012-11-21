@@ -1,9 +1,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include "../include/main.h"
 #include "../include/bst.h"
-  
+#include "../include/vfs_17.h"
+
+	static struct node* bstRoot = NULL;
     /* Add Elements to the Binary Search Tree */
     void insertBst(struct File_Descriptor *data ) {
        
@@ -24,10 +25,17 @@
             strcpy(full_path,"/");
             strcat(full_path,data->sfile_name);
         }
-       
+        // printf("location of data %ld", data->llocation_block_no);
         /*adding data to newNode*/
         strcpy(newNode->full_path,full_path);
-        newNode->fd1  = data;
+        strcpy(newNode->full_path,full_path);
+		//printf("ful path in node %s\n", full_path);
+		newNode->fd1 = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
+		strcpy(newNode->fd1->sfile_name, data->sfile_name);
+		strcpy(newNode->fd1->slocation_full_path, data->slocation_full_path);
+		newNode->fd1->sfile_type = data->sfile_type;
+		newNode->fd1->lfile_size = data->lfile_size;
+		newNode->fd1->llocation_block_no = data->llocation_block_no;
         newNode->left = NULL;
         newNode->right = NULL;
         newNode->parent = NULL;
@@ -43,13 +51,14 @@
             /*traverses to the position where new node is to be inserted*/
             while(temp){
                 /*checks for the duplicate data and retuns Failure in such case*/
-                if( strcmp( newNode->full_path ,temp->full_path) ==0 ){
+                /*if( strcmp( newNode->full_path ,temp->full_path) ==0 ){
                     printf("duplicate--\n");
                     temp = NULL;
-                }
-                else{
+                }*/
+
+               // else{
                     /*if the data is less than the current's node data , move to left*/
-                    if( strcmp( newNode->full_path ,temp->full_path) >0 ){
+                    if( strcmp( newNode->full_path ,temp->full_path) <0 ){
                         /*keeps the track of the parent node*/
                         tempParent = temp;
                         temp = temp->left;
@@ -59,7 +68,7 @@
                         tempParent = temp;
                         temp = temp->right;
                     }
-                }
+                //}
             }
             newNode->parent = tempParent;
            
@@ -75,6 +84,8 @@
                 //printf (" right %s \n", newNode->full_path);
             }
         }
+       // displayList();
+        //return 10;
     }
    /*Inorder traversal of BST*/
     void inorder(struct node *t){
@@ -99,6 +110,8 @@
     struct node* searchBstRec(struct node *t,char *data){
         /*if bstRoot is null or key is equal to bstRoot, return bstRoot*/
         if(t == NULL || (strcmp(data,t->full_path) ==0)){
+            //printf("%s\n",t->full_path);
+            //printf("%s\n",t->fd1->slocation_full_path);
             return t;
         }
         else
@@ -120,15 +133,21 @@
         struct node *temp = searchBstRec(t,data);
         /*if temp points to null return false else return true*/
         if(temp == NULL) {
-            printf("element is not present");
+            //printf("element is not present");
             return Failure;
         }
         else
         {
-            printf("element is present");
+            //printf("element is present");
             return Success;
         }
     }
+    
+    struct node *searchBstFD(char *data){
+	struct node *t = bstRoot;
+	struct node *temp = searchBstRec(t,data);
+	return temp;
+	}
    
    
     /*transplant function for delete function. It transplants node1 with node2*/
@@ -176,7 +195,7 @@
        
         /*if the element is there in the list ,deletes the same.*/
         if(location != NULL){
-            printf("element is present\n");
+           // printf("element is present\n");
             /*if the node does not have a left child, transplant it with right child*/
             if(location->left == NULL){
                 transplantTree(location,location->right);
@@ -212,7 +231,7 @@
         else
         {
             /*the element is not there in the list.*/
-            printf("element is not present\n");
+            //printf("element is not present\n");
         }
     }
   

@@ -13,7 +13,7 @@ struct List_Node *listInsertStart( List_Node *head, char *key, struct File_Descr
 struct List_Node *listSearchStrKey( struct List_Node *head, char *key);
 
 //delete a node
-struct List_Node *listDeleteNode(struct List_Node *head, char *key);
+void listDeleteNode(struct List_Node *head, char *key, char *path);
 
 //display list
 void display(struct List_Node *head);
