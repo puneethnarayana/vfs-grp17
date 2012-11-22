@@ -18,9 +18,9 @@
 #include<string.h>
 #include "../include/vfs_errorcodes.h"
 
-#define BUFSIZE 200
-#define CMDSIZE 30
-#define PARSIZE 100
+#define BUFSIZE 400
+#define CMDSIZE 40
+#define PARSIZE 200
 
 int errcode;
 

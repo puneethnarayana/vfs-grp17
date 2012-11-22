@@ -164,17 +164,17 @@ int create_VFS(char *vfsname, long size) {
 }
 
 //mounting vfs
-int mount_VFS(char *name) {
+int mount_VFS(char *mname) {
 	
 	
 	//vfs already mounted
 	if(MOUNTED == 1){ return 04; }
 
 	//insufficient arguments
-	if(strcmp(name, "") == 0) { return 00; }
+	if(strcmp(mname, "") == 0) { return 00; }
 	
 	
-	fptr = fopen(name, "rb+"); // opening file for read/write
+	fptr = fopen(mname, "rb+"); // opening file for read/write
 	if(fptr == NULL) {
 		return 01; //datafile not found
 	}
@@ -225,7 +225,7 @@ int make_dir(char *parent_path, char *dir_name){
 	//printf("******************in make dir****************");
 	//displayList();
 	//printf("%s %s", parent_path, dir_name);
-	//char parent_path[100] = "";
+	char parent_pathpure[512] = "";
 
 	//vfs not mounted
 	if(MOUNTED == 0){ return 05; }
@@ -242,17 +242,18 @@ int make_dir(char *parent_path, char *dir_name){
 	//check for name validity
 	if(strstr(dir_name, "/") != NULL) { return 02; }
 
-	/*if(strcmp(parent_pathtmp,"/")!=0) {
-		if(parent_pathtmp[strlen(parent_pathtmp)- 1] == '/') {
+	if(strcmp(parent_path,"/")!=0) {
+		if(parent_path[strlen(parent_path)- 1] == '/') {
 			//printf("Here\n");
-			strncpy(parent_path, parent_pathtmp, strlen(parent_pathtmp) - 2);
+			strncpy(parent_pathpure, parent_path, strlen(parent_path) - 1);
 		}
-	}*/
+		else{strcpy(parent_pathpure, parent_path);}
+	}
 	
 	char totalPath[512];
 	 if(strcmp(parent_path,"/")!=0)
         {
-			strcpy(totalPath,parent_path);
+			strcpy(totalPath,parent_pathpure);
 			strcat(totalPath,"/");
 			strcat(totalPath,dir_name);
         }
@@ -270,12 +271,12 @@ int make_dir(char *parent_path, char *dir_name){
 	//else
 	//printf("/n************null**********/n" );
 	if(exist!=1){
-		int existParentPath = searchBst(parent_path);
+		int existParentPath = searchBst(parent_pathpure);
 		//printf("existParentPath %d",existParentPath);
 		if(!existParentPath){
 			int j, i=0; 
 			char parent_path_temp[512];
-			strcpy(parent_path_temp,parent_path);
+			strcpy(parent_path_temp,parent_pathpure);
 			token[0] = strtok(parent_path_temp, "/"); 
 			while(token[i]!= NULL) { 
    
@@ -309,7 +310,7 @@ int make_dir(char *parent_path, char *dir_name){
 			}
 		}
 		//if(token[0]==""){
-			dirInsert(parent_path, dir_name);
+			dirInsert(parent_pathpure, dir_name);
 			
 			
 			//printf("BST Diplay\n \n");
@@ -325,8 +326,8 @@ return 10;
 
 int move_dir(char* source_path,char* destination_path){
 	
-	//char source_path[100] = "";
-	//char destination_path[100] = "";
+	char source_pathtmp[512] = "";
+	char destination_pathtmp[512] = "";
 	//insufficient argument
 
 	//not munted
@@ -336,22 +337,24 @@ int move_dir(char* source_path,char* destination_path){
 	if(strcmp(destination_path, "") == 0) { return 00; }
 
 
-	/*if(strcmp(source_pathtmp,"/")!=0) {
-		if(source_pathtmp[strlen(source_pathtmp)- 1] == '/') {
+	if(strcmp(source_path,"/")!=0) {
+		if(source_path[strlen(source_path)- 1] == '/') {
 			//printf("Here\n");
-			strncpy(source_path, source_pathtmp, strlen(source_pathtmp) - 2);
+			strncpy(source_pathtmp, source_path, strlen(source_path) - 1);
 		}
+		else{strcpy(source_pathtmp, source_path);}
 	}
 
-	if(strcmp(destination_pathtmp,"/")!=0) {
-		if(destination_pathtmp[strlen(destination_pathtmp)- 1] == '/') {
+	if(strcmp(destination_path,"/")!=0) {
+		if(destination_path[strlen(destination_path)- 1] == '/') {
 			//printf("Here\n");
-			strncpy(destination_path, destination_pathtmp, strlen(destination_pathtmp) - 2);
+			strncpy(destination_pathtmp, destination_path, strlen(destination_path) - 1);
 		}
-	}*/
+		else{strcpy(destination_pathtmp, destination_path);}
+	}
 
-	struct node *ndsrc4 = searchBstFD(source_path);
-	struct node *nddest4 = searchBstFD(destination_path);
+	struct node *ndsrc4 = searchBstFD(source_pathtmp);
+	struct node *nddest4 = searchBstFD(destination_pathtmp);
 	
 	//source not found
 	if(ndsrc4 == NULL) { return 01;}
@@ -366,7 +369,7 @@ int move_dir(char* source_path,char* destination_path){
 	if( nddest4->fd1->sfile_type == 'f') { return 07; }
 
 	//printf("in move dir\n");
-	move_node(root,source_path,destination_path);
+	move_node(root,source_pathtmp,destination_pathtmp);
 
 return 10;
 }
@@ -442,7 +445,7 @@ int list_dir(char* path,int flag,char *harddiskpath) {
 int delete_dir(char *path) {
 	//printf("above");
 	//insufficient arguments
-	//char path[100] = "";
+	char purepath[512] = "";
 
 	//not munted
 	if(MOUNTED == 0){ return 04; }
@@ -450,14 +453,17 @@ int delete_dir(char *path) {
 	if(strcmp(path, "") == 0) { return 00; }
 
 
-	/*if(strcmp(pathtmp,"/")!=0) {
-		if(pathtmp[strlen(pathtmp)- 1] == '/') {
+	if(strcmp(path,"/")!=0) {
+		if(path[strlen(path)- 1] == '/') {
 			//printf("Here\n");
-			strncpy(path, pathtmp, strlen(pathtmp) - 2);
+			strncpy(purepath, path, strlen(path) - 1);
 		}
-	}*/
+		else{
+			strcpy(purepath, path);
+		}
+	}
 
-	struct node *nd = searchBstFD(path);
+	struct node *nd = searchBstFD(purepath);
 	if (nd != NULL) {
 	//printf("in dele dir b4 dele \n");
 	//printtree(root);
@@ -484,7 +490,7 @@ int unmount_VFS(char *uname) {
 	if(MOUNTED == 0){ return 04; }
 
 	//insufficient arguments
-	if(strcmp(uname, "") == 0) { return 00; }
+	if(strcmp(uname, "") == 0) { return 0; }
 	//printf("uname: %s vfslabel: %s\n", uname, m1.sfile_system_label);
 
 	if(strcmp(m1.sfile_system_label, uname) == 0){
@@ -761,6 +767,9 @@ int move_File(char *srcfilepath, char *destfilepathtmp) {
 			//printf("Here\n");
 			strncpy(destfilepath, destfilepathtmp, strlen(destfilepathtmp) - 1);
 		}
+		else {
+			strcpy(destfilepath, destfilepathtmp);
+		}
 	}
 	
 	//source file exists or not
@@ -839,6 +848,9 @@ int copy_File(char *srcpath, char *destpath) {
 								strncpy(full_path, destpath, strlen(destpath) - 1);
 								//dest[strlen(dest - 1)] = '\0';
 								//printf("%s\n",dest);
+							}
+							else{
+								strcpy(full_path, destpath);
 							}
 
 
