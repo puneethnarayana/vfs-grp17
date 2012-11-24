@@ -730,7 +730,7 @@ int export_File(char *filepath, char *outputfile) {
 		FILE *fp = fopen (outputfile, "wb+" ) ;
 					if ( fp == NULL )
 							{
-								printf("here");
+								//printf("here");
 								return 02;
 					}
 					else {
