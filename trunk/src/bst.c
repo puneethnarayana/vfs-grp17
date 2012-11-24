@@ -93,7 +93,7 @@
         temp = t;
         if(temp){
             inorder(temp->left);
-            printf("\n %s \n",temp->full_path);
+            //printf("\n %s \n",temp->full_path);
             inorder(temp->right);
         }
     }
@@ -101,8 +101,9 @@
    /*Display elements in the BST*/
     void displayList(){
         struct node *temp = bstRoot;
-        if(bstRoot == NULL)
-            printf("empty tree\n");
+        if(bstRoot == NULL){
+           // printf("empty tree\n");
+        }
         else
             inorder(temp);
     }
@@ -180,7 +181,7 @@
         while(m->left != NULL){
             m = m->left;
         }
-        printf("%s",m->full_path);
+       // printf("%s",m->full_path);
         return m;
     }
   
