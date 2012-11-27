@@ -249,6 +249,7 @@ int make_dir(char *parent_path, char *dir_name){
 		}
 		else{strcpy(parent_pathpure, parent_path);}
 	}
+	else{strcpy(parent_pathpure, parent_path);}
 	
 	char totalPath[512];
 	 if(strcmp(parent_path,"/")!=0)
@@ -344,6 +345,7 @@ int move_dir(char* source_path,char* destination_path){
 		}
 		else{strcpy(source_pathtmp, source_path);}
 	}
+	else{strcpy(source_pathtmp, source_path);}
 
 	if(strcmp(destination_path,"/")!=0) {
 		if(destination_path[strlen(destination_path)- 1] == '/') {
@@ -352,6 +354,7 @@ int move_dir(char* source_path,char* destination_path){
 		}
 		else{strcpy(destination_pathtmp, destination_path);}
 	}
+	else{strcpy(source_pathtmp, source_path);}
 
 	struct node *ndsrc4 = searchBstFD(source_pathtmp);
 	struct node *nddest4 = searchBstFD(destination_pathtmp);
@@ -770,7 +773,9 @@ int move_File(char *srcfilepath, char *destfilepathtmp) {
 		else {
 			strcpy(destfilepath, destfilepathtmp);
 		}
-	}
+	}else {
+			strcpy(destfilepath, destfilepathtmp);
+		}
 	
 	//source file exists or not
 	struct node *ndsrc1 = searchBstFD(srcfilepath);
