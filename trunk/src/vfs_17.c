@@ -689,7 +689,7 @@ int remove_File(char *filepath) {
 		//deleting from Hash Table
 		deleteHashTable(&ht1, nd->fd1->sfile_name, nd->fd1->slocation_full_path);
 		//detele from naray
-		delete_dir(filepath);
+		//delete_dir(filepath);
 		//making bitmap available
 		long a= nd->fd1->llocation_block_no;
 		bitmapUpdate(a, 0);
@@ -795,6 +795,7 @@ int move_File(char *srcfilepath, char *destfilepathtmp) {
 	
 	
 	copy_File(srcfilepath,  destfilepath);
+	//giving error
 	remove_File(srcfilepath);
 	//printlist(ln1);
 	//displayList();
