@@ -4,275 +4,295 @@
 #include<stdlib.h>
 #include "../include/nary.h"
 #include "../include/vfs_17.h"
+#include "../include/bst.h"
 
 #define TRUE 1
 #define FALSE 0
+void pathchange(t_node **root);
+t_node* getchild(t_node **node);
+void delete_nodes(t_node *node);
 
-t_node* returnnode(t_node* root, char* path)
+//function to return the searched node
+t_node* returnnode(t_node **root,char *fullpath)
 {
-   	t_node* retnode = NULL;
-	t_node* temp = root;
-	char new[1024][80];
-    char * pch;
-	int i=1,t=0,cnt=0;
-	
-	if(root == NULL)
-  	{
-   		return NULL;
- 	}
-	
-	pch = strtok (path,"/");
-	strcpy(new[0],"/");
-    while (pch != NULL)
-    {
-    strcpy(new[i],pch);
-    i++;
-    pch = strtok (NULL, "/");
+	int n, i,j,count = 1,c;
+	char **new;
+	char spath[200];
+	int flag = 1;
 
-    }
-	cnt = i;
-	int count = 0,flag=0;
-	
-	if(strcmp(root->data->sfile_name,new[0])!=0)
+	t_node *retnode;
+	if(*root == NULL)
 	{
+		
+		return 0;
+	}
+
+	strcpy(spath,fullpath);
+	n = strlen(spath);
+	if(n==1)
+		count = 1;
+	else
+	{
+	for(i=1;i<n;i++){
+		if(spath[i]=='/')
+			count++;
+	}
+		count++;
+	}
+             
+	(new) = (char **)malloc(sizeof(char*)*count);
+        i = 0;
+	for(c=0;c<count;c++)
+	{
+		j = 0;
+		new[c] = (char *)malloc(sizeof(char) * 50);
+		while(spath[i] != '/' && spath[i]!='\0')
+		{
+			new[c][j] = spath[i];
+			i++;
+			j++;
+		}
+		i++;
+		new[c][j] = '\0';
+	}
+
+	new[0][0] = '/';
+	new[0][1] = '\0';
+        i = 0;
+	retnode = *root;
+       while(retnode != NULL)
+	{          
+		if(retnode->is_deleted == 0 && strcmp(retnode->data->sfile_name,new[i]) == 0)
+		{
+			i++;
+                       if(i == count)
+				{
+                 break;
+				}
+			retnode = retnode->left;
+			
+		}
+		
+		else if(retnode->sibling != NULL)
+		{
+			retnode = retnode->sibling;
+		}
+		else
+		{
+			flag =0;
+			break;
+		}
+	}
+     
+	
+	if(flag == 0 || retnode == NULL)
+	{
+		
 		return NULL;
 	}
-
-	while(1)
-	{
-    	if(strcmp(temp->data->sfile_name,new[count])==0)
-    	{  
-  			retnode = temp; 
-        	count++;
-        	if(count == cnt)
-          	break;
-        	if(temp->left!=NULL){
-        		temp = temp->left;
-			}
-			else
-			{
-				    retnode = NULL;
-					break;
-			}
-      		flag = 0;
-      		
-      		if(strcmp(temp->data->sfile_name,new[count])==0)
-      		{  
-          	    retnode = temp;
-           		count++;
-            	if(count == cnt){
-					break;
-				}
-				if(temp->left == NULL)
- 				{ 
- 					retnode = NULL;
-  					break;
- 				}
-
-   				if(temp->left!=NULL)
-					temp = temp->left;
-      		}
-      		else
-      		{
-				if(temp->sibling == NULL)
-                {  
-					flag = 0;
-                    break;
-                }
-                
-        	   	while(temp->sibling!=NULL)
-            	{
-					
-					temp=temp->sibling;
-               		if(strcmp(temp->data->sfile_name,new[count])==0)
-                	{  
-        	       	   retnode = temp;
-            	   	   flag = 1;
-              		    break;
-               		 }
-               		 
-      			 }
-       			if(flag == 0)
-       			 {
-              	  	retnode = NULL;
-             		break;
-       			 }
-   		      }
         
-			}
-	  }
-	  return retnode;
-      
-}
+	return (retnode);
+	}
+
 
 int move_node(t_node* root,char* source_path,char* destination_path)
-{
-	//printtree(root);	
-	//printf("in move node function of nary %s\n",root->data->sfile_name);
-	t_node *temp = root;
+ {
 	
-	t_node *node = returnnode(temp,source_path);
-	//printf("got node is %s\n",node->data->sfile_name);
-	t_node *node2 = returnnode(temp,destination_path);
-	//printf("got node2 is %s\n",node2->data->sfile_name);
-	if(node == NULL || node2 == NULL)
-    {
-    	//printf("\nError!!");
-    	return -1;
-    }
-
-	if(node->is_deleted == TRUE || node2->is_deleted == TRUE)
-    {
-   		//printf("\nWrong path!!");
-    	return -1;
-  	}
-	
-	int i=0;
-	//printf("%d",i);
-	t_node* new_node = (t_node*)malloc(sizeof(t_node));
-	new_node->sibling = NULL;
-	if(node->left == NULL){
-		//printf("No directory or path in source dir/n");
-	}
-	else{
-		node = node->left;
-	}
-	new_node->parent = node->parent;
-	new_node->is_deleted = node->is_deleted;
-	new_node->data = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
-  	new_node->data->sfile_type = node->data->sfile_type;
-	
-	new_node->data->lfile_size = node->data->lfile_size;
-	strcpy(new_node->data->sfile_name,node->data->sfile_name);
-	strcpy(new_node->data->slocation_full_path,node->data->slocation_full_path);
-
-           new_node->data->llocation_block_no = node->data->llocation_block_no;
-
-	if(node->left!=NULL)
-	{
-		new_node->left = (t_node*)malloc(sizeof(t_node));
-		new_node->left->parent = new_node;
-		create_copy(node->left,new_node->left,new_node);
-	}
-	else
-		new_node->left = NULL;
-
-	struct File_Descriptor* data = new_node->data;
-	strcpy(data->slocation_full_path,destination_path);
-	new_node->parent = node2;
-	if(new_node->left!=NULL)
-		copy_path(new_node->left);
-	if(node2->left == NULL)
-  		node2->left = new_node;
-	else
-  	{
-    	 node2 = node2->left;
-         while(node2->sibling!=NULL)
-       	 	node2 = node2->sibling;
-   		node2->sibling = new_node;
- 	 }
-	 delete_node(&root,source_path);
-	 //printf("printing after move_dir/n");
-	 //printtree(root);
-	 //printf("end of printing after move_dir/n");	
-	 return 0;
-}
-
-
-int create_copy(t_node* old_node,t_node* new_node,t_node* par)
-{
-	if(old_node == NULL)
-    	return;
-	int i=0;
-	strcpy(new_node->node_name,old_node->node_name);
-	new_node->is_deleted = old_node->is_deleted;
-	new_node->data = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
-    new_node->data->sfile_type = old_node->data->sfile_type;
-	new_node->left_traversed = old_node->left_traversed;
-	new_node->data->lfile_size = old_node->data->lfile_size;
-	strcpy(new_node->data->sfile_name,old_node->data->sfile_name);
-	strcpy(new_node->data->slocation_full_path,old_node->data->slocation_full_path);
-	
-    new_node->data->llocation_block_no = old_node->data->llocation_block_no;
-	new_node->parent = par;
- 	if(old_node->left!=NULL)
-  	{
-    	new_node->left = (t_node*)malloc(sizeof(t_node));
-     	create_copy(old_node->left,new_node->left,new_node);
-   	}
-
- 	if(old_node->sibling!=NULL)
-  	{
-    	new_node->sibling = (t_node*)malloc(sizeof(t_node));
-     	create_copy(old_node->sibling,new_node->sibling,par);
-   	}
-	return 0;
-}
  
-int copy_path(t_node* node)
-{
-	if(node == NULL)
-    	return;
-  	struct File_Descriptor* data = node->data;
-  	struct File_Descriptor* data1 = node->parent->data;
- 	char* newpath = (char*)malloc(sizeof(data1->slocation_full_path)+sizeof(data1->sfile_name)+2);
-    strcpy(newpath,data1->slocation_full_path);
-    strcat(newpath,"/");
-    strcat(newpath,data1->sfile_name);
-    strcat(newpath,"\0");
-    strcpy(data->slocation_full_path,newpath);
-   	if(node->left!=NULL)
-    {
-    	copy_path(node->left);
-    }
-  	if(node->sibling!=NULL)
-    	copy_path(node->sibling);
-	return 0;
-}
+  char temppath[100],tempfname[100];
 
-int delete_node(t_node** root,char* fullpath)
-{
+  strcpy(temppath,source_path);
 
-	t_node* temp = *root;	
-	t_node* node = returnnode(temp,fullpath);
-	if(node == NULL)
-    {
-   		//printf("\nNo such node!!");
-    	return -1;
+ 
+ 	
+ 	t_node *temp = root;
+        t_node *temp1 = root;
+        t_node *temp3,*temp4,*temp5;
+	
+ 	t_node *node = returnnode(&temp,source_path);
+   strcpy(tempfname,node->data->sfile_name);
+       
+ 	//printf("dhgjh%s\n", tempfname);
+ 	t_node *node2 = returnnode(&temp1,destination_path);
+        //printf("returned") 
+         
+     //printf("egserger%s\n", node2->data->sfile_name);
+ 
+
+ 	if(node->is_deleted == TRUE || node2->is_deleted == TRUE)
+     {
+    		
+     	return -1;
    	}
+	
+ 	int i=0;
+//checking if any of the path is not existing
+  if(node!=NULL && node2!=NULL)
+  {
+    		temp4=node->parent;
+		if(temp4->left==node)
+		{
+		      temp4->left=node->sibling;
+		      node->sibling=NULL;
+	    	}
+              else
+    	      {
+      		temp5=temp4->left;
+		      while(temp5->sibling!=node)
+		      {
+			temp5=temp5->sibling;
+		      }
+	      temp5->sibling=node->sibling;
+	      node->sibling=NULL;
+              }
+    //getting the node to from where it has to be moved
 
-	//printf("\nString..%s",node->data->sfile_name);
-	int flag = 0;
-	node->is_deleted = TRUE;
-	if(node->left!=NULL)
-  	{ 
-  		node = node->left;
- 		delete_recursively(node);  
-  	}   
-
-    return 0;
-
-}
+temp3=getchild(&node2); 
+    if(temp3==NULL)
+    {
+	      node2->left=node;
+	      node->parent=node2;
+	      char c[100];
+      //copying the full path for root
 
 
-int delete_recursively(t_node* node)
+      if(strcmp(node2->data->slocation_full_path,"/")==0)
+      {
+			strcpy(c,"/");
+			strcat(c,node2->data->sfile_name);
+			strcpy(node->data->slocation_full_path,c);
+      }
+       //copying for the other nodes
+      else
+      {
+        
+			strcpy(c,node2->data->slocation_full_path);
+			strcat(strcat(c,"/"),node2->data->sfile_name);
+			strcpy(node->data->slocation_full_path,c);
+      }
+      
+    }
+    else
+    {
+	      
+	      temp3->sibling=node;
+	      node->parent=temp3->parent;
+	      strcpy(node->data->slocation_full_path,temp3->data->slocation_full_path);
+	      
+	    }
+    
+   
+    
+    delete_nodes(node->left);
+    char a[200],b[200];
+    strcpy(a,temppath);
+    if(strcmp(a,"/")==0)
+   
+    deleteBstElm(tempfname);
+    else
+    {
+	      int i=0;
+	      strcpy(b,"\0");
+	      strcpy(b,a);
+	      strcat(strcat(b,"/"),tempfname);
+	      
+              deleteBstElm(b);
+    }
+    insertBst(node->data); 
+    pathchange(&node);
+    
+     return 1;
+  }
+ 	
+ 	
+ 	 
+ }
+
+void pathchange(t_node **root)
 {
-	if(node == NULL)
-      return;
-    node->is_deleted = TRUE;
-  	if(node->left!=NULL)
-    	delete_recursively(node->left);
-  	if(node->sibling!=NULL)
-   		delete_recursively(node->sibling);
-  	return 0;
+  t_node *temp1=*root,*temp=*root;
+  if(root!=NULL)
+  	{
+    		if(temp1->left!=NULL)
+    		{
+		      temp=temp1;
+		      temp1=temp1->left;
+		      
+		      deleteBstElm(temp1->data->slocation_full_path);
+		      temp1->parent=temp;
+		      char res[100];
+			      if(strcmp(temp->data->slocation_full_path,"/")==0)
+			      {
+					strcpy(res,temp->data->slocation_full_path);
+					strcpy(temp1->data->slocation_full_path,strcat(res,temp1->parent->data->sfile_name));
+			      }
+			      else
+			      {
+				      strcpy(res,temp->data->slocation_full_path);
+				      strcpy(temp1->data->slocation_full_path,strcat(strcat(res,"/"),temp1->parent->data->sfile_name));
+			      }
+		      insertBst(temp1->data );
+		      pathchange(&temp1);
+    }
+    
+      while(temp1->sibling!=NULL)
+      {
+        temp=temp1;
+        temp1=temp1->sibling;
+        temp1->parent=temp->parent;
+        char res[100];
+				strcpy(res,temp->data->slocation_full_path);
+				strcpy(temp1->data->slocation_full_path,temp->data->slocation_full_path);
+        //inserttree(cnode->data);
+        pathchange(&temp);
+      }
+  }
+  return;
+} 
+t_node* getchild(t_node **node)
+{
+       t_node *temp=*node;
+  		if(temp->left==NULL)
+  			return NULL;
+  
+ 		 else{
+    			temp=temp->left;
+    			while(temp->sibling!=NULL)
+    				{
+      					temp=temp->sibling;
+   				 }
+    				return(temp);
+   	 } 
 }
+void delete_nodes(t_node *node)
+{       char path[200];
+  if(node!=NULL)
+  {
+  
+  delete_nodes(node->left);
+  //copying the path
+  strcpy(path,node->data->slocation_full_path);
+  if(strcmp(path,"/")==0)
+        deleteBstElm(node->data->slocation_full_path);
+  
+ 	 else
+  	{
+    			strcat(strcat(path,"/"),node->data->sfile_name);
+               			 deleteBstElm(path);
+    
+ 	 }
+  delete_nodes(node->sibling);
+  }
+  return ;
+}
+
     
     void printtree(t_node *root)
     {
     t_node *temp=root;
-    //printf("----------Current VFS Structure----------\n\n%s",temp->node_name);
+    //printf("----------retnode VFS Structure----------\n\n%s",temp->node_name);
     temp=temp->left;
-    //printf("\n%s",temp->node_name);
+    printf("\n%s",temp->data->sfile_name);
     while(temp!=root && temp!=NULL)
     {
 
@@ -281,17 +301,17 @@ int delete_recursively(t_node* node)
 		//printf("\nLeft of - %s",temp->data->sfile_name);
 		temp=temp->left;
 		if(temp->is_deleted==0) {}
-		//printf("\nLeft - %s",temp->data->sfile_name);
+		printf("\nLeft - %s",temp->data->sfile_name);
     }
     else 
     {
 		if(temp->sibling!=NULL )
 		{
 		temp->left_traversed = 0;
-		//printf("\nsibling of - %s",temp->data->sfile_name);
+		printf("\nsibling of - %s",temp->data->sfile_name);
 		temp=temp->sibling;
 		if(temp->is_deleted==0) {}
-		//printf("\nsibling - %s",temp->data->sfile_name);
+		printf("\nsibling - %s",temp->data->sfile_name);
 		}
 		else
 		{
@@ -301,7 +321,7 @@ int delete_recursively(t_node* node)
 		}
 	}
     }
-    //printf("\n\n");
+    printf("\n\n");
     }
     
 
@@ -310,12 +330,12 @@ int delete_recursively(t_node* node)
     t_node *temp=root;
     int rootcheck = 0;
     int i = 1,pos=0,j=0,y,z;
-    int fail_cause=-1;
+    int flag1=-1;
     int flag = 0;
 
     char str[1024];
     char new[1024][80];
-    char * pch;
+    char * starray;
     char full_path[512];
     if(strcmp(fd1->slocation_full_path,"/")!=0)
         {
@@ -332,13 +352,13 @@ int delete_recursively(t_node* node)
     //printf("in nary fd fName is %s and root data is %s\n",fd1->sfile_name,root->node_name);
     if(exist!=1){
     strcpy(str,fd1->slocation_full_path);
-    pch = strtok (str,"/");
+    starray = strtok (str,"/");
 	strcpy(new[0],"/");
-    while (pch != NULL)
+    while (starray != NULL)
     {
-    strcpy(new[i],pch);
+    strcpy(new[i],starray);
     i++;
-    pch = strtok (NULL, "/");
+    starray = strtok (NULL, "/");
 
     }
     while(temp)
@@ -356,7 +376,7 @@ int delete_recursively(t_node* node)
     else
     {
     //printf("Wrong path !!!");
-    fail_cause = 0;
+    flag1 = 0;
     }
     rootcheck=1;
     }
@@ -365,7 +385,7 @@ int delete_recursively(t_node* node)
     if(temp!=NULL)
     {
 		//printf("2.in temp!=null of nary \n");
-    if(fail_cause==-1 && j!=i && strcmp(temp->node_name,new[j])==0)
+    if(flag1==-1 && j!=i && strcmp(temp->node_name,new[j])==0)
     {
     prev=temp;
     temp=temp->left;
@@ -383,7 +403,7 @@ int delete_recursively(t_node* node)
     }
     }
     
-    if(fail_cause == -1)
+    if(flag1 == -1)
     {
     if(prev->left==NULL)
     {
@@ -412,22 +432,19 @@ new->data->llocation_block_no = fd1->llocation_block_no;
     {
 	t_node *new=(t_node*)malloc(sizeof(t_node));
 	new->data = (struct File_Descriptor*)malloc(sizeof(struct File_Descriptor));
-strcpy(new->data->sfile_name, fd1->sfile_name);
-strcpy(new->data->slocation_full_path, fd1->slocation_full_path);
-new->data->sfile_type = fd1->sfile_type;
-new->data->lfile_size = fd1->lfile_size;
-new->data->llocation_block_no = fd1->llocation_block_no;
-//printf("in nary\n \n");
-//printf("fd1->sfile_name %s\n", new->data->sfile_name);
-//printf("slocation_full_path %s\n", new->data->slocation_full_path);
-    new->left_traversed=0;
-   // new->data = fd1;
-    new->parent=prev;
-    sib->sibling=new;
-    strcpy(new->node_name,fd1->sfile_name);
-    new->left=NULL;
-    new->sibling=NULL;
-    new->is_deleted = 0;
+	strcpy(new->data->sfile_name, fd1->sfile_name);
+	strcpy(new->data->slocation_full_path, fd1->slocation_full_path);
+	new->data->sfile_type = fd1->sfile_type;
+	new->data->lfile_size = fd1->lfile_size;
+	new->data->llocation_block_no = fd1->llocation_block_no;
+
+	  new->left_traversed=0;
+	  new->parent=prev;
+	  sib->sibling=new;
+    	strcpy(new->node_name,fd1->sfile_name);
+    	new->left=NULL;
+    	new->sibling=NULL;
+    	new->is_deleted = 0;
     }
     else
     {
@@ -446,11 +463,11 @@ int delete(struct File_Descriptor* data,t_node *root)
 t_node *temp=root;
 int rootcheck = 0;
 int i = 1,pos=0,j=0,y,z;
-int fail_cause=-1;
+int flag1=-1;
 int delete_check=0;
 char str[1024];
 char new[1024][80];
-char * pch;
+char * starray;
 if(strcmp(data->slocation_full_path,"/")!=0)
 {
 strcpy(str,data->slocation_full_path);
@@ -463,15 +480,15 @@ strcpy(str,"/");
 strcat(str,data->sfile_name);
 }
 //strcpy(str,data->slocation_full_path);
-pch = strtok (str,"/");
+starray = strtok (str,"/");
 strcpy(new[0],"/");
-while (pch != NULL)
-{ strcpy(new[i],pch);
+while (starray != NULL)
+{ strcpy(new[i],starray);
 i++;
-pch = strtok (NULL, "/");
+starray = strtok (NULL, "/");
 }
 //printf("after while");
-while((temp->left!=NULL || temp->sibling!=NULL) && j != i && fail_cause==-1) //j<i ||
+while((temp->left!=NULL || temp->sibling!=NULL) && j != i && flag1==-1) //j<i ||
 {
 //printf("in while %d\n", j);
 if(rootcheck == 0)
@@ -487,14 +504,14 @@ j++;
 else
 {
 //printf("Wrong path !!!");
-fail_cause = 0;
+flag1 = 0;
 break;
 }
 rootcheck=1;
 }
 if(temp!=NULL)
 {
-if(fail_cause==-1 && j!=i && strcmp(temp->node_name,new[j])==0)
+if(flag1==-1 && j!=i && strcmp(temp->node_name,new[j])==0)
 { //printf("in temp!=null %d \n", j);
 //printf("inif temp->node_name %s,new[%d] %s\n", temp->node_name,j,new[j]);
 prev=temp;
@@ -509,18 +526,18 @@ temp=temp->sibling;
 }
 }
 else{
-//printf("in fail_cause %d\n",fail_cause);
-fail_cause=0;
+//printf("in flag1 %d\n",flag1);
+flag1=0;
 delete_check=0;
 }
 }
-//printf("b4 ! fail_cause %d\n",fail_cause);
-if(fail_cause == -1)
+//printf("b4 ! flag1 %d\n",flag1);
+if(flag1 == -1)
 {
-// printf("in ! fail_cause %d\n",fail_cause);
+// printf("in ! flag1 %d\n",flag1);
 while(temp)
 {
-//printf("in fail_cause while %s %s\n",temp->node_name,data->sfile_name);
+//printf("in flag1 while %s %s\n",temp->node_name,data->sfile_name);
 if(strcmp(temp->node_name,data->sfile_name)==0)
 {
 //create
@@ -626,10 +643,10 @@ int list_tree_rec(t_node *root,char* harddiskpath)
 int list_tree(t_node** root,int flag,char* fullpath,char* harddiskpath)
 {
    t_node* retnode = NULL;
-   int errcode = 10;
+  int errcode;
    if(root == NULL){}
    
-   retnode = returnnode(*root,fullpath);
+   retnode = returnnode(root,fullpath);
    if(retnode == NULL)
    {
      //printf("\nNo such node!!");

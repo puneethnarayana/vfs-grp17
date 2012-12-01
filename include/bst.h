@@ -14,6 +14,7 @@
 	void inorder(struct node *t);
 	void displayList();
 	int searchBst(char *data);
+        void deleteBstElm(char *data);
 	struct node* searchBstRec(struct node *t,char *data);
 	void transplantTree(struct node *delNode,struct node *delNodeChild);
 	void deleteElm(struct node *t,char *data);
