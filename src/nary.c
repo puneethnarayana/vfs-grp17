@@ -124,6 +124,9 @@ int move_node(t_node* root,char* source_path,char* destination_path)
     		
      	return -1;
    	}
+
+	if(node->parent == node2)
+	{return 3;}
 	
  	int i=0;
 //checking if any of the path is not existing
