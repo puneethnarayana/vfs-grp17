@@ -39,6 +39,9 @@ void movefile ( char *P1, char *P2 );
 void copyfile ( char *P1, char *P2 );
 void exportfile ( char *P1, char *P2 );
 void searchfile ( char *P1, char *P2 );
+void man(char* P1);
+void cat(char* P1);
+
 
 void processcommand( char *command, char *P1, char *P2, char *P3 );
 
@@ -132,6 +135,10 @@ void processcommand( char *command, char *P1, char *P2, char *P3 )
 		searchfile(P1, P2);
 	else if( strcmp(command, "stats") == 0 )
 		stats ();
+	else if( strcmp(command, "man") == 0 )
+		man (P1);
+	else if( strcmp(command, "cat") == 0 )
+		cat(P1);
 	else
 		printf("Ignoring invalid command %s\n", command);
 

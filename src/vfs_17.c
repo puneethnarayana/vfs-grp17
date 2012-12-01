@@ -372,9 +372,10 @@ int move_dir(char* source_path,char* destination_path){
 	if( nddest4->fd1->sfile_type == 'f') { return 07; }
 
 	//printf("in move dir\n");
-	int errcode=move_node(root,source_pathtmp,destination_pathtmp);
-	if(errcode==3)
-		{return 05;}
+	//int errcode=
+		move_node(root,source_pathtmp,destination_pathtmp);
+	//if(errcode==3)
+		//{return 05;}
 	
 
 return 10;
@@ -1156,4 +1157,106 @@ void stats()
 		printf("\nTotal File Descriptors: %ld", m1.ltotal_file_descriptors);
 		printf("\nAvailable File Descriptors: %ld\n", m1.ltotal_file_descriptors - freeLocation());
 		//fclose(fptr);
+}
+
+void man(char* search_name){
+
+if(!strcmp(search_name,"createvfs")){
+	printf("FUNCTION:\t createvfs (vfs_label,size)\n");
+	printf("Description:\nTo create a Virtual File System. <vfs_label> is the name of VFS. Size specified in kilobytes. Valid range is 1 to 1024 (inclusive)\n\n");
+}
+else if(!strcmp(search_name,"mountvfs")){
+	printf("FUNCTION:\t mountvfs (vfs_label) \n");
+	printf("Description:\nTo Mount the VFS path on current directory. This involves loading the file/directory descriptors into various data structures\n\n");
+
+}
+else if(!strcmp(search_name,"unmountvfs")){
+	printf("FUNCTION:\t unmountvfs (vfs_label)\n");
+	printf("Description:\nTo unmount the VFS. It involves saving index information and tree information back into the hard disk.\n\n");
+
+}
+else if(!strcmp(search_name,"makedir")){
+	printf("FUNCTION:\t makedir (parent_path, dir_name) \n");
+	printf("Description:\nTo create a new directory whose name should be<dir_name> in path specified by <parent_path> where '/' is considered as 'root' directory.\n\n");
+
+
+}
+else if(!strcmp(search_name,"deletedir")){
+	printf("FUNCTION:\t deletedir (path) \n");
+	printf("Description:\nTo remove a file or a directory as indicated by < name>\n\n");
+
+}
+else if(!strcmp(search_name,"movedir")){
+	printf("FUNCTION:\t movedir (source_dir_path,dest_dir_path) \n");
+	printf("Description:\nTo move a sub-tree <source_dir_path> to <dest_dir_path> directory.\n\n");
+
+}
+else if(!strcmp(search_name,"listdir")){
+	printf("FUNCTION:\t listdir (dir_name,flag, outputfile) \n");
+	printf("Description:\nList all the contents according to <flag> of the current directory i.e. specified by <dir_name>. Flag “-R” means recursive listing of the entire subtree. The output of listdir is saved in outputfile in the hard-disk.\n\n");
+
+}
+else if(!strcmp(search_name,"addfile")){
+	printf("FUNCTION:\t addfile (dest_dir_name, file_name, data) \n");
+	printf("Description:\nCreate a new file named <file_name> with <data> as content. in path specified by <dest_dir_name>. “data” corresponds to an external file residing in the hard disk.\n\n");
+
+}
+else if(!strcmp(search_name,"listfile")){
+	printf("FUNCTION:\t listfile (file_path, output_file) \n");
+	printf("Description:\nExtract the contents of a file specified by <file_path> and store in output file.\n\n");
+}	
+else if(!strcmp(search_name,"updatefile")){
+	printf("FUNCTION:\t updatefile (file_path, data) \n");
+	printf("Description:\nUpdate/Edit the contents of a file specified by <file_path> with <data>.\n\n");	
+}
+else if(!strcmp(search_name,"removefile")){
+	printf("FUNCTION:\t removefile (file_path)  \n");
+	printf("Description:\nRemove a file specified by <file_path>.\n\n");
+}
+else if(!strcmp(search_name,"exportfile")){
+	printf("FUNCTION:\t exportfile (vfs_file_path, hard_disk_path)  \n");
+	printf("Description:\nExport the file from the file system into the hard disk\n\n");	
+}	
+else if(!strcmp(search_name,"searchfile")){
+	printf("FUNCTION:\t searchfile (name, outputfile)  \n");
+	printf("Description:\nRetrieves the full path of all the files/folders having the given name as part of its at the beginning of file/folder name (substring). The output is stored in outputfile.\n\n");		
+}
+else if(!strcmp(search_name,"copyfile")){
+	printf("FUNCTION:\t  copyfile (source_file_path,dest_file_path) \n");
+	printf("Description:\nTo copy source file to destination specified. The destination includes full file path including file name. Overwrite the destination file if it already exists.\n\n");	
+}
+else if(!strcmp(search_name,"movefile")){
+	printf("FUNCTION:\t exportfile (vfs_file_path, hard_disk_path)  \n");
+	printf("Description:\nRename <source_file_path> to <dest_file_path> file. The destination includes full file path including file name.Overwrite the destination file if it already exists.\n\n");	
+	}
+}
+
+void cat(char *filepath) {
+	
+
+	struct node *nd = searchBstFD(filepath);
+	if(!textfilecheck(filepath)) {
+		printf("not a text file\n");
+	}
+
+	else {
+	if (nd != NULL) {
+		fseek(fptr,m1.freeblock,SEEK_SET);
+		long a = nd->fd1->llocation_block_no;
+		fseek(fptr,a*sizeof(b1),SEEK_CUR);
+
+		//strcat(harddiskpath, "/");
+		//strcat(harddiskpath, nd->fd1->sfile_name);
+						fread(&b1, sizeof(b1), 1, fptr);
+						int i=0;
+						while(b1.sfixed_size_buffer[i] != '\0') {
+							printf("%c",b1.sfixed_size_buffer[i]);
+							i++;
+						}
+		}		
+			else {
+				printf("path not found\n");
+				// source file path not found
+			}		
+	}			
 }
