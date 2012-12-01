@@ -372,7 +372,7 @@ int move_dir(char* source_path,char* destination_path){
 	if( nddest4->fd1->sfile_type == 'f') { return 07; }
 
 	//printf("in move dir\n");
-	//move_node(root,source_pathtmp,destination_pathtmp);
+	move_node(root,source_pathtmp,destination_pathtmp);
 
 return 10;
 }
@@ -440,7 +440,7 @@ int list_dir(char* path,int flag,char *harddiskpath) {
 			strncpy(path, pathtmp, strlen(pathtmp) - 2);
 		}
 	}*/
-	
+	//int errcode =10;
 	int errcode = list_tree(&root,flag,path,harddiskpath);
 	return errcode;
 }
@@ -465,13 +465,18 @@ int delete_dir(char *path) {
 			strcpy(purepath, path);
 		}
 	}
+	else{strcpy(purepath, path);}
 
 	struct node *nd = searchBstFD(purepath);
 	if (nd != NULL) {
 	//printf("in dele dir b4 dele \n");
 	//printtree(root);
-	int deli = delete(nd->fd1,root);
-	if(deli == 2) { return 02;} 
+	
+	//change
+	//int deli = delete(nd->fd1,root);
+	//if(deli == 2) { return 02;} 
+	
+	
 	//printf("in dele dir after dele nary \n");
 	//printtree(root);
 	//deleting from BSTl
@@ -499,7 +504,7 @@ int unmount_VFS(char *uname) {
 	if(strcmp(m1.sfile_system_label, uname) == 0){
 		//printf("\n--------------------Unmounting VFS\n");
 		fclose(fptr);
-		free(fl1.bitmap);
+		//free(fl1.bitmap);
 		//printf("\n--------------------VFS Unmounted\n");
 		MOUNTED = 0;
 		return 10;
