@@ -372,7 +372,10 @@ int move_dir(char* source_path,char* destination_path){
 	if( nddest4->fd1->sfile_type == 'f') { return 07; }
 
 	//printf("in move dir\n");
-	move_node(root,source_pathtmp,destination_pathtmp);
+	int errcode=move_node(root,source_pathtmp,destination_pathtmp);
+	if(errcode==3)
+		{return 05;}
+	
 
 return 10;
 }
